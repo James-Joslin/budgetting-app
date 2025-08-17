@@ -1,34 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from '../api/api';
+import { useAccounts } from '../contexts/AccountContext';
 
 export default function UploadForm() {
-    const [accounts, setAccounts] = useState([]);
+    const { accounts, loading, error } = useAccounts(); // Get accounts from context
+    
     const [selected, setSelected] = useState('');
     const [file, setFile] = useState(null);
     const [status, setStatus] = useState('');
     const [isDragOver, setIsDragOver] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
 
-    useEffect(() => {
-        const fetchAccounts = async () => {
-            try {
-                const res = await axios.get('/uploads/getAccounts');
-                
-                // Transform Rows array into objects with id and name properties
-                const accountObjects = res.data.Rows.map(row => ({
-                    id: row[0],
-                    name: row[1]
-                }));
-                
-                setAccounts(accountObjects);
-            } catch (error) {
-                console.error('Error fetching accounts:', error);
-                setStatus('Error loading accounts');
-            }
-        };
-
-        fetchAccounts();
-    }, []);
+    // Remove the old useEffect and accounts state - we're getting it from context now
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -88,7 +71,7 @@ export default function UploadForm() {
         const droppedFile = e.dataTransfer.files[0];
         if (droppedFile && (droppedFile.name.endsWith('.qif') || droppedFile.name.endsWith('.ofx'))) {
             setFile(droppedFile);
-            setStatus(''); // Clear any previous status
+            setStatus('');
         } else if (droppedFile) {
             setStatus('Please select a QIF or OFX file');
         }
@@ -98,9 +81,8 @@ export default function UploadForm() {
         const selectedFile = e.target.files[0];
         if (selectedFile && (selectedFile.name.endsWith('.qif') || selectedFile.name.endsWith('.ofx'))) {
             setFile(selectedFile);
-            setStatus(''); // Clear any previous status
+            setStatus('');
         } else if (selectedFile) {
-            // Reset the input value so the same invalid file can be selected again
             e.target.value = '';
             setStatus('Please select a QIF or OFX file');
         }
@@ -110,6 +92,16 @@ export default function UploadForm() {
         const selectedAccount = accounts.find(acc => acc.id === selected);
         return selectedAccount ? selectedAccount.name : '';
     };
+
+    // Show loading state if accounts are still being fetched
+    if (loading && accounts.length === 0) {
+        return (
+            <div className="p-2 bg-white rounded-lg shadow">
+                <h2 className="text-xl font-bold mb-4 text-gray-800">Upload Financial Data</h2>
+                <p className="text-gray-600">Loading accounts...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="p-2 bg-white rounded-lg shadow">
@@ -136,6 +128,7 @@ export default function UploadForm() {
                     </select>
                 </div>
 
+                {/* Rest of your component remains the same */}
                 {/* File Upload Area */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">

@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import axios from '../api/api';
+import { useAccounts } from '../contexts/AccountContext';
 
 export default function NewAccountForm() {
+    const { fetchAccounts } = useAccounts(); // Get fetchAccounts from context
+    
     const [form, setForm] = useState({ 
         AccountName: '', 
         FirstName: '', 
@@ -23,7 +26,20 @@ export default function NewAccountForm() {
                 StartingBalance: parseFloat(form.StartingBalance),
                 StartingDate: form.StartingDate,
             });
+            
+            // Refresh the accounts list
+            await fetchAccounts();
+            
             setStatus(`Account created with ID ${res.data.account_id}`);
+            
+            // Clear form after success
+            setForm({ 
+                AccountName: '', 
+                FirstName: '', 
+                LastName: '', 
+                StartingBalance: '', 
+                StartingDate: '' 
+            });
         } catch (err) {
             setStatus(`Error: ${err.response?.data?.error || err.message}`);
         }
@@ -35,6 +51,7 @@ export default function NewAccountForm() {
                 name="AccountName" 
                 type="text" 
                 placeholder="Account Name" 
+                value={form.AccountName}
                 onChange={handleChange} 
                 className="border p-2 w-full" 
             />
@@ -43,6 +60,7 @@ export default function NewAccountForm() {
                     name="FirstName" 
                     type="text" 
                     placeholder="First Name" 
+                    value={form.FirstName}
                     onChange={handleChange} 
                     className="border p-1 w-full" 
                 />
@@ -50,6 +68,7 @@ export default function NewAccountForm() {
                     name="LastName" 
                     type="text" 
                     placeholder="Last Name" 
+                    value={form.LastName}
                     onChange={handleChange} 
                     className="border p-1 w-full" 
                 />
@@ -59,6 +78,7 @@ export default function NewAccountForm() {
                 type="number" 
                 step="0.01" 
                 placeholder="Starting Balance" 
+                value={form.StartingBalance}
                 onChange={handleChange} 
                 className="border p-2 w-full" 
             />
@@ -66,6 +86,7 @@ export default function NewAccountForm() {
                 name="StartingDate" 
                 placeholder="Starting Balance Date" 
                 type="date" 
+                value={form.StartingDate}
                 onChange={handleChange} 
                 className="border p-2 w-full" 
             />
