@@ -1,20 +1,14 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+// contexts/AccountContext.jsx
+import React, { createContext, useState, useEffect } from 'react';
 import axios from '../api/api';
 
-const AccountContext = createContext();
-
-export const useAccounts = () => {
-    const context = useContext(AccountContext);
-    if (!context) {
-        throw new Error('useAccounts must be used within AccountProvider');
-    }
-    return context;
-};
+export const AccountContext = createContext();
 
 export const AccountProvider = ({ children }) => {
     const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [selectedAccountId, setSelectedAccountId] = useState(null);
     
     const fetchAccounts = async () => {
         setLoading(true);
@@ -47,7 +41,9 @@ export const AccountProvider = ({ children }) => {
             fetchAccounts, 
             loading, 
             error,
-            setAccounts 
+            setAccounts,
+            selectedAccountId,
+            setSelectedAccountId
         }}>
             {children}
         </AccountContext.Provider>

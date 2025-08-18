@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from '../api/api';
-import { useAccounts } from '../contexts/AccountContext';
+import { useAccounts } from '../contexts/useAccounts';
 
 export default function NewAccountForm() {
     const { fetchAccounts } = useAccounts(); // Get fetchAccounts from context

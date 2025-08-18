@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import axios from '../api/api';
-import { useAccounts } from '../contexts/AccountContext';
+import { useAccounts } from '../contexts/useAccounts';
 
 export default function UploadForm() {
-    const { accounts, loading, error } = useAccounts(); // Get accounts from context
+    const { accounts, loading, error, setSelectedAccountId } = useAccounts(); // Get accounts from context
     
     const [selected, setSelected] = useState('');
     const [file, setFile] = useState(null);
@@ -115,7 +115,10 @@ export default function UploadForm() {
                     </label>
                     <select 
                         value={selected}
-                        onChange={e => setSelected(e.target.value)} 
+                        onChange={e => {
+                            setSelected(e.target.value);
+                            setSelectedAccountId(e.target.value);  // Update context
+                        }}
                         className="border border-gray-300 rounded p-2 w-full text-black bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         disabled={isUploading}
                     >
@@ -149,7 +152,7 @@ export default function UploadForm() {
                         <input
                             type="file"
                             onChange={handleFileSelect}
-                            accept=".qif,.ofx"
+                            accept=".ofx"
                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                             disabled={isUploading}
                         />
@@ -161,7 +164,7 @@ export default function UploadForm() {
                                     <p className={`${file ? 'text-green-600 font-medium' : 'text-gray-600'}`}>
                                         {file ? `✓ ${file.name}` : 'Choose file or drag and drop'}
                                     </p>
-                                    <p className="text-sm text-gray-400">QIF or OFX files only</p>
+                                    <p className="text-sm text-gray-400">OFX files only</p>
                                 </>
                             )}
                         </div>
